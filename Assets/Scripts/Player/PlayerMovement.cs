@@ -21,6 +21,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float gravity = -9.81f;
     [SerializeField] float groundDistance = 0.4f;
     [SerializeField] float jumpHeight;
+    [SerializeField] bool isImmortal;
 
     [Header("Object")]
     public Camera playerCamera;
@@ -135,6 +136,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void TakeDamage(Damage damage)
     {
+        if (isImmortal)
+            return;
+
         Health -= damage.damage;
         if (Health <= 0)
         {
@@ -196,3 +200,4 @@ public struct Damage
 {
     public float damage;
 }
+

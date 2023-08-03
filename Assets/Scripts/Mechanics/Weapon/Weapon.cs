@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public sealed class Weapon : MonoBehaviour
@@ -56,7 +54,7 @@ public sealed class Weapon : MonoBehaviour
     {
         RaycastHit hit = raycastInfo.GetRaycastObject(indexWeapon.Range);
 
-        if (hit.transform.GetComponent<NPC>())
+        if (hit.transform.GetComponent<NPC>() != null)
             return;
 
         nextTiemToShot = Time.time + indexWeapon.DelayToNexyShot;
@@ -69,20 +67,21 @@ public sealed class Weapon : MonoBehaviour
         if (hit.transform == null)
             return;
 
-        // Shot Script
+        Debug.Log(hit.transform.name);
         ImpactManager.Instance.CreateImpact(hit);
-        if(hit.transform.GetComponent<Rigidbody>())
+        if(hit.transform.TryGetComponent(out Rigidbody body))
         {
-            hit.transform.GetComponent<Rigidbody>().AddForce(-hit.normal * 1000f, ForceMode.Force);
+            body.AddForce(-hit.normal * 1000f, ForceMode.Force);
         }
-        if(hit.transform.GetComponent<ObjectDestroyable>())
+        if(hit.transform.TryGetComponent(out ObjectDestroyable objectDestroy))
         {
-            hit.transform.GetComponent<ObjectDestroyable>().TakeDamage(0f, true);
+            objectDestroy.TakeDamage(0f, true);
         }
-        if(hit.transform.GetComponent<EnemyHitbox>())
+        if(hit.transform.TryGetComponent(out Hitbox hb))
         {
-            hit.transform.GetComponent<EnemyHitbox>().TakeDamage(new Damage{ damage = giveDamageEnemy});
-            Debug.Log("Shot " + hit.transform.name);
+            hb.TakeDamage(new Damage{
+                damage = giveDamageEnemy
+            });
         }
     }
 
