@@ -5,12 +5,14 @@ public class ChaseState : IEnemyAIState
 {
     private Transform playerTarget;
     private EnemyProps enemyProps;
+    private EnemyWeapon enemyWeapon;
     private const float speedOfChase = 2f;
 
-    public ChaseState(Transform playerTarget, EnemyProps enemyProps)
+    public ChaseState(Transform playerTarget, EnemyProps enemyProps, EnemyWeapon enemyWeapon)
     {
         this.playerTarget = playerTarget;
         this.enemyProps = enemyProps;
+        this.enemyWeapon = enemyWeapon;
     }
 
     public void EnterState(EnemyAI ai)
@@ -23,14 +25,22 @@ public class ChaseState : IEnemyAIState
     {
         enemyProps.Animator.SetBool("Run", false);
         enemyProps.Animator.SetBool("Attack", false);
+
+        enemyWeapon.IsAttack = false;
     }
 
     public void UpdateState()
     {
         enemyProps.Agent.SetDestination(playerTarget.position);
 
-        enemyProps.Animator.SetBool("Attack", Vector3.Distance(enemyProps.Agent.transform.position, playerTarget.position) < enemyProps.Agent.stoppingDistance + 2.2f
-                   && Mathf.Abs(Vector3.Angle(enemyProps.Agent.transform.position, (playerTarget.position - enemyProps.Agent.transform.position))) > 10f);
+        enemyProps.Animator.SetBool("Attack", ReadyToAttack());
+        enemyWeapon.IsAttack = ReadyToAttack();
+    }
+
+    private bool ReadyToAttack()
+    {
+        return Vector3.Distance(enemyProps.Agent.transform.position, playerTarget.position) < enemyProps.Agent.stoppingDistance + 2.2f
+               && Mathf.Abs(Vector3.Angle(enemyProps.Agent.transform.position, (playerTarget.position - enemyProps.Agent.transform.position))) > 10f;
     }
 }
 

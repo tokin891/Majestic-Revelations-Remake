@@ -9,6 +9,8 @@ public class EnemyController : MonoBehaviour
     private bool isJumping = false;
 
     [SerializeField]
+    private float attackDamage = 15f;
+    [SerializeField]
     float healthOnStart = 100f;
     [SerializeField] 
     Transform[] waypoints;
@@ -25,7 +27,15 @@ public class EnemyController : MonoBehaviour
 
     private EnemyProps enemyProps;
 
+    public EnemyWeapon EnemyWeapon { get; set; }
     public float Health { private set; get; }
+    public float AttackDamage
+    {
+        get
+        {
+            return attackDamage;
+        }
+    }
 
     private void Awake()
     {
@@ -55,7 +65,7 @@ public class EnemyController : MonoBehaviour
     {
         isJumping = false;
 
-        enemyAI.SetState(new ChaseState(playerTarget.transform, enemyProps));
+        enemyAI.SetState(new ChaseState(playerTarget.transform, enemyProps, EnemyWeapon));
     }
 
     public void OnPlayerLost()
@@ -67,6 +77,7 @@ public class EnemyController : MonoBehaviour
     {     
         if (playerTarget == null)
             return false ;
+        Debug.Log("Search Player");
 
         slightEyes.transform.LookAt(playerTarget.transform);
         if (Physics.Raycast(slightEyes.transform.position, slightEyes.transform.forward, out var hit))
@@ -79,27 +90,34 @@ public class EnemyController : MonoBehaviour
         if (slightSeePlayer)
         {
             if (distance > radiusSeePlayer)
+            {
+                Debug.Log("To long distance");
                 return false;
+            }
         }
         else
+        {
+            Debug.Log("Dont see player");
             return false;
+        }
 
-        if (IsOnAngleViewForward() && playerTarget.isCrouching) 
+        if (IsOffAngleViewForward() && playerTarget.isCrouching) 
             return false;
-        if (IsOnAngleViewUp())
+        if (IsOffAngleViewUp())
             return false;
 
         return true;
     }
 
-    private bool IsOnAngleViewForward()
+    private bool IsOffAngleViewForward()
     {
         return Mathf.Abs(Vector3.Angle(transform.forward, (playerTarget.transform.position - transform.position))) > 90f;
     }
 
-    private bool IsOnAngleViewUp()
+    private bool IsOffAngleViewUp()
     {
-        return Mathf.Abs(Vector3.Angle(transform.up, (playerTarget.transform.position - transform.position)) - 90f) > 5f;
+        Debug.Log(Mathf.Abs(Vector3.Angle(transform.up, (playerTarget.transform.position - transform.position)) - 90f) > 7f);
+        return Mathf.Abs(Vector3.Angle(transform.up, (playerTarget.transform.position - transform.position)) - 90f) > 7f;
     }
 
     public void TakeDamage(Damage dmg)

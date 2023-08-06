@@ -77,7 +77,7 @@ public sealed class Weapon : MonoBehaviour
         {
             objectDestroy.TakeDamage(0f, true);
         }
-        if(hit.transform.TryGetComponent(out Hitbox hb))
+        if(hit.transform.TryGetComponent(out EnemyHitbox hb))
         {
             hb.TakeDamage(new Damage{
                 damage = giveDamageEnemy
